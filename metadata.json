@@ -1,0 +1,5 @@
+{
+  "name": "YouTube Transcriber",
+  "description": "A glassmorphic React application to transcribe YouTube videos using AI, featuring a modern UI with animated backgrounds and real-time status updates.",
+  "requestFramePermissions": []
+}
