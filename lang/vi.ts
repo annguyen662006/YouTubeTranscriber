@@ -17,23 +17,23 @@ export const VI = {
   home: {
     heroTitle: "Chuyển đổi Video YouTube",
     heroTitleBreak: "sang Văn bản",
-    description: "Công nghệ Native Audio Processing: Trích xuất âm thanh trực tiếp và sử dụng AI để nghe và chép lại chính xác từng từ.",
+    description: "Sức mạnh Supabase & Gemini 2.5: Xử lý âm thanh Native Audio trên Cloud Server tốc độ cao.",
     placeholder: "Dán đường dẫn URL video YouTube tại đây...",
     startBtn: "Bắt đầu chuyển đổi",
     features: {
-      noCard: "Native Speech-to-Text",
-      fast: "Không phỏng đoán",
-      multiLang: "Độ chính xác 99%"
+      noCard: "Cloud Processing",
+      fast: "Native Audio Model",
+      multiLang: "Đa ngôn ngữ"
     }
   },
   loading: {
-    title: "Đang xử lý âm thanh thực...",
-    subtitle: "Chúng tôi đang tải luồng âm thanh từ YouTube và gửi cho AI nghe. Quá trình này đảm bảo độ chính xác tuyệt đối.",
+    title: "Đang xử lý trên Cloud...",
+    subtitle: "Yêu cầu đã được gửi tới Supabase Edge Function. Hệ thống đang tải âm thanh và phân tích trực tiếp.",
     steps: {
-      audio: "Kết nối máy chủ Audio",
-      api: "Đang tải xuống file âm thanh (MP3)...",
-      extract: "AI đang nghe và phân tích...",
-      timestamp: "Đồng bộ hóa thời gian..."
+      audio: "Kết nối Supabase Cloud",
+      api: "Server đang tải Audio...",
+      extract: "Gemini 2.5 đang nghe...",
+      timestamp: "Đang tạo định dạng JSON..."
     },
     cancel: "Hủy bỏ"
   },
@@ -45,18 +45,18 @@ export const VI = {
     duration: "Thời lượng",
     language: "Ngôn ngữ phát hiện",
     footer: {
-      model: "Powered by Gemini 2.5 Flash (Native Audio)",
+      model: "Powered by Gemini 2.5 Flash (Server-side)",
       export: ["Export .SRT", "Export .TXT", "Export .JSON"]
     }
   },
   error: {
     title: "Lỗi xử lý",
-    defaultMessage: "Không thể tải xuống âm thanh từ video này. Video có thể quá dài, bị giới hạn bản quyền hoặc Server tải đang bận.",
+    defaultMessage: "Đã xảy ra lỗi khi xử lý trên Server. Vui lòng kiểm tra lại URL hoặc thử lại sau.",
     tryAgain: "Thử lại",
     report: "Báo cáo vấn đề",
     breadcrumbs: {
       url: "URL",
-      analyze: "Tải âm thanh",
+      analyze: "Cloud Analyze",
       result: "Kết quả"
     }
   },
