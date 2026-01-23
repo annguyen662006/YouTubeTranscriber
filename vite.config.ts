@@ -6,7 +6,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      // Ưu tiên API_KEY, nếu không có thì tìm VITE_API_KEY, cuối cùng là chuỗi rỗng để tránh crash
+      'process.env.API_KEY': JSON.stringify(env.API_KEY || env.VITE_API_KEY || ''),
     },
     server: {
       port: 3000,
