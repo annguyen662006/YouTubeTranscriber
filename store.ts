@@ -42,6 +42,25 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       }
   },
 
+  deleteHistoryItem: async (id: string) => {
+      // Thêm option count: 'exact' để kiểm tra số dòng thực sự bị xóa
+      const { error, count } = await supabase
+          .from('transcriptions')
+          .delete({ count: 'exact' })
+          .eq('id', id);
+
+      if (!error && count !== null && count > 0) {
+          // Chỉ cập nhật state nếu DB đã xóa thành công ít nhất 1 dòng
+          set((state) => ({
+              history: state.history.filter(item => item.id !== id)
+          }));
+      } else {
+          console.error("Failed to delete history item:", error || "No rows deleted (Check RLS Policies)");
+          // Nếu xóa thất bại (do lỗi mạng hoặc RLS chặn), reload lại history để đảm bảo đồng bộ
+          get().fetchHistory();
+      }
+  },
+
   setUrl: (url) => set({ url }),
 
   fetchTranscription: async () => {

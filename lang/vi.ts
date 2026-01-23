@@ -1,8 +1,7 @@
 
-
 export const VI = {
   header: {
-    title: "YouTube Transcriber",
+    title: "Chép Lời YouTube",
     nav: {
       home: "Trang chủ",
       history: "Lịch sử",
@@ -16,7 +15,7 @@ export const VI = {
     startBtn: "Bắt đầu trích xuất",
     footerText: "Phát triển bởi Thành Vinh",
     features: {
-      noCard: "Direct Extraction",
+      noCard: "Trích xuất trực tiếp",
       fast: "Tốc độ cực nhanh",
       multiLang: "Hỗ trợ mọi ngôn ngữ"
     }
@@ -63,13 +62,21 @@ export const VI = {
           video: "Video / Tiêu đề",
           duration: "Thời lượng",
           status: "Trạng thái",
-          date: "Ngày tạo"
+          date: "Ngày tạo",
+          action: "Hành động"
       },
       status: {
           success: "Thành công",
           error: "Lỗi"
       },
-      modalTitle: "Nội dung chi tiết"
+      modalTitle: "Nội dung chi tiết",
+      delete: {
+          tooltip: "Xóa bản ghi",
+          title: "Xác nhận xóa",
+          message: "Bạn có chắc chắn muốn xóa bản ghi này không? Hành động này không thể hoàn tác.",
+          confirm: "Xóa vĩnh viễn",
+          cancel: "Hủy bỏ"
+      }
   },
   error: {
     title: "Không thể trích xuất",
@@ -82,5 +89,5 @@ export const VI = {
       result: "Kết quả"
     }
   },
-  footer: "© 2024 YouTube Transcriber. All rights reserved."
+  footer: "© 2026 Chép Lời YouTube. Bảo lưu mọi quyền."
 };

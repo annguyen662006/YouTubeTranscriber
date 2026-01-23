@@ -136,13 +136,7 @@ const ResultView: React.FC = () => {
                     <span className="material-symbols-outlined text-[20px] group-hover:rotate-180 transition-transform">refresh</span>
                     <span>{VI.result.new}</span>
                 </button>
-                <button 
-                    onClick={handleFixGrammar}
-                    className="glass-button-secondary h-10 px-4 rounded-xl flex items-center gap-2 text-sm font-medium text-purple-300 hover:text-purple-200 border-purple-500/20 hover:bg-purple-500/10"
-                >
-                    <span className="material-symbols-outlined text-[20px]">auto_fix_high</span>
-                    <span>{VI.result.fixGrammar}</span>
-                </button>
+                {/* Removed 'Sửa lại (Thủ công)' button here */}
                 <button 
                     onClick={handleCopy}
                     className="h-10 px-5 rounded-xl bg-primary hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm font-bold text-white shadow-lg shadow-blue-500/20"

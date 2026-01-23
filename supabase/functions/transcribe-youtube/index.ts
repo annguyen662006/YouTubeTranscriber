@@ -1,4 +1,5 @@
 
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenAI, Type } from "npm:@google/genai";
 
@@ -163,7 +164,7 @@ serve(async (req) => {
     
     // Chuẩn bị dữ liệu Fallback
     const fallbackResult = {
-        title: data.title || "Unknown Video", // Get Title from RapidAPI data
+        title: data.title || "Video không tên", // Get Title from RapidAPI data
         duration: formatTimestamp(groqData.duration || 0),
         language: groqData.language || "Unknown",
         segments: groqData.segments ? groqData.segments.map((s: any) => ({

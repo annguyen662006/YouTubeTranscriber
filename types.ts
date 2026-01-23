@@ -42,6 +42,7 @@ export interface TranscriptionState {
   // History
   history: HistoryItem[];
   fetchHistory: () => Promise<void>;
+  deleteHistoryItem: (id: string) => Promise<void>;
 
   // Actions
   setUrl: (url: string) => void;
