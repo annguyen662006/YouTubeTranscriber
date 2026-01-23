@@ -1,5 +1,4 @@
 
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenAI, Type } from "npm:@google/genai";
 
@@ -52,13 +51,13 @@ serve(async (req) => {
             contents: {
                 parts: [{ 
                     text: `
-                    Bạn là một chuyên gia biên tập ngôn ngữ. Nhiệm vụ của bạn là kiểm tra và sửa lỗi chính tả, ngữ pháp, dấu câu và viết hoa danh từ riêng cho văn bản sau đây.
-                    
-                    Yêu cầu:
-                    1. Giữ nguyên ý nghĩa gốc của văn bản.
-                    2. Chỉ sửa lỗi sai, không viết lại văn phong trừ khi câu văn quá lủng củng.
-                    3. Trả về kết quả dưới dạng JSON object với key "correctedText".
-                    4. KHÔNG thêm bất kỳ lời dẫn nào khác.
+                    Bạn là một chuyên gia biên tập nội dung. Nhiệm vụ của bạn là chỉnh sửa văn bản dưới đây.
+
+                    Các yêu cầu bắt buộc:
+                    1. CHỈNH SỬA: Sửa lỗi chính tả, ngữ pháp, dấu câu và viết hoa danh từ riêng.
+                    2. ĐỊNH DẠNG ĐOẠN VĂN (QUAN TRỌNG): Hãy tự động phân chia văn bản thành các đoạn văn (paragraphs) hợp lý dựa trên sự thay đổi của ý tưởng hoặc chủ đề. 
+                    3. KÝ TỰ NGĂN CÁCH: Sử dụng đúng 2 ký tự xuống dòng (\n\n) để ngăn cách giữa các đoạn văn.
+                    4. KHÔNG thay đổi ý nghĩa gốc hoặc thêm lời dẫn. Chỉ trả về nội dung đã chỉnh sửa.
 
                     Văn bản gốc:
                     ${text}

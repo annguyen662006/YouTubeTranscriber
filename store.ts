@@ -3,23 +3,12 @@ import { create } from 'zustand';
 import { TranscriptionState } from './types';
 import { VI } from './lang/vi';
 import { createClient } from '@supabase/supabase-js';
-import { GoogleGenAI, Type } from "@google/genai";
 
 // Khởi tạo Supabase Client
 const SUPABASE_URL = 'https://gljzvvegdkwpgitbnjcb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_S0ZBExbtXioOE3DgS26fgA_Nwq46a_A'; // Publishable Key
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Helper function để khởi tạo Gemini Client an toàn
-const getGeminiClient = () => {
-    const apiKey = process.env.API_KEY;
-    // Kiểm tra kỹ hơn các trường hợp null/undefined/chuỗi rỗng
-    if (!apiKey || apiKey === 'undefined' || apiKey.trim() === '') {
-        throw new Error("API Key (Google Gemini) chưa được cấu hình. Vui lòng kiểm tra biến môi trường.");
-    }
-    return new GoogleGenAI({ apiKey });
-};
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -158,7 +147,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
             if (data.segments) {
                 let finalData = data;
 
-                // --- AUTO GRAMMAR FIX STEP ---
+                // --- AUTO GRAMMAR FIX STEP (MOVED TO SERVER) ---
                 set({ 
                     progress: 90, 
                     loadingMessage: VI.loading.steps.fixing 
@@ -167,58 +156,30 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
                 try {
                     const rawText = finalData.segments.map((s: any) => s.text).join('\n\n');
                     
-                    // Call Gemini directly for grammar fix (Lazy Init)
-                    const ai = getGeminiClient();
-
-                    const response = await ai.models.generateContent({
-                        model: "gemini-3-flash-preview",
-                        contents: {
-                            parts: [{ 
-                                text: `
-                                Bạn là một chuyên gia biên tập nội dung. Nhiệm vụ của bạn là chỉnh sửa văn bản dưới đây.
-
-                                Các yêu cầu bắt buộc:
-                                1. CHỈNH SỬA: Sửa lỗi chính tả, ngữ pháp, dấu câu và viết hoa danh từ riêng.
-                                2. ĐỊNH DẠNG ĐOẠN VĂN (QUAN TRỌNG): Hãy tự động phân chia văn bản thành các đoạn văn (paragraphs) hợp lý dựa trên sự thay đổi của ý tưởng hoặc chủ đề. 
-                                3. KÝ TỰ NGĂN CÁCH: Sử dụng đúng 2 ký tự xuống dòng (\n\n) để ngăn cách giữa các đoạn văn.
-                                4. KHÔNG thay đổi ý nghĩa gốc hoặc thêm lời dẫn. Chỉ trả về nội dung đã chỉnh sửa.
-
-                                Văn bản gốc:
-                                ${rawText}
-                                ` 
-                            }]
-                        },
-                        config: {
-                            responseMimeType: "application/json",
-                            responseSchema: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    correctedText: { type: Type.STRING }
-                                },
-                                required: ["correctedText"]
-                            }
+                    // Gọi Edge Function thay vì gọi trực tiếp Gemini ở Client
+                    const { data: fixData, error: fixError } = await supabase.functions.invoke('transcribe-youtube', {
+                        body: { 
+                            action: 'fix_grammar', 
+                            text: rawText 
                         }
                     });
 
-                    const jsonStr = response.text;
-                    if (jsonStr) {
-                        const parsed = JSON.parse(jsonStr);
-                        if (parsed.correctedText) {
-                            // Tạo segments mới từ văn bản đã sửa (Lưu ý: sẽ mất timestamps chi tiết)
-                            const newSegments = parsed.correctedText.split('\n\n').map((t: string) => ({
-                                timestamp: '', 
-                                text: t.trim()
-                            })).filter((s: any) => s.text.length > 0);
-                            
-                            finalData = {
-                                ...finalData,
-                                segments: newSegments
-                            };
-                        }
+                    if (!fixError && fixData && fixData.correctedText) {
+                        // Tạo segments mới từ văn bản đã sửa
+                        const newSegments = fixData.correctedText.split('\n\n').map((t: string) => ({
+                            timestamp: '', 
+                            text: t.trim()
+                        })).filter((s: any) => s.text.length > 0);
+                        
+                        finalData = {
+                            ...finalData,
+                            segments: newSegments
+                        };
+                    } else {
+                        console.warn("Auto-fix grammar server returned no data or error:", fixError);
                     }
                 } catch (geminiError: any) {
-                    console.warn("Auto-fix grammar failed or API Key missing, using raw transcript:", geminiError);
-                    // Không throw lỗi ở đây để user vẫn nhận được kết quả thô nếu key lỗi
+                    console.warn("Auto-fix grammar failed, using raw transcript:", geminiError);
                 }
                 // --- END AUTO GRAMMAR FIX STEP ---
                 
@@ -289,50 +250,24 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     if (!transcript) return "";
 
     try {
-        // Lazy initialization
-        const ai = getGeminiClient();
-        
         const fullText = transcript.segments.map(s => s.text).join('\n\n');
 
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: {
-                parts: [{ 
-                    text: `
-                    Bạn là một chuyên gia biên tập nội dung. Nhiệm vụ của bạn là chỉnh sửa văn bản dưới đây.
-
-                    Các yêu cầu bắt buộc:
-                    1. CHỈNH SỬA: Sửa lỗi chính tả, ngữ pháp, dấu câu và viết hoa danh từ riêng.
-                    2. ĐỊNH DẠNG ĐOẠN VĂN (QUAN TRỌNG): Hãy tự động phân chia văn bản thành các đoạn văn (paragraphs) hợp lý dựa trên sự thay đổi của ý tưởng hoặc chủ đề. 
-                    3. KÝ TỰ NGĂN CÁCH: Sử dụng đúng 2 ký tự xuống dòng (\n\n) để ngăn cách giữa các đoạn văn.
-                    4. KHÔNG thay đổi ý nghĩa gốc hoặc thêm lời dẫn. Chỉ trả về nội dung đã chỉnh sửa.
-
-                    Văn bản gốc:
-                    ${fullText}
-                    ` 
-                }]
-            },
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        correctedText: { type: Type.STRING }
-                    },
-                    required: ["correctedText"]
-                }
+        // Gọi Edge Function thay vì Gemini trực tiếp
+        const { data, error } = await supabase.functions.invoke('transcribe-youtube', {
+            body: { 
+                action: 'fix_grammar', 
+                text: fullText 
             }
         });
 
-        const jsonStr = response.text;
-        if (!jsonStr) throw new Error("Không nhận được phản hồi từ AI.");
+        if (error) throw new Error(error.message || "Lỗi khi gọi server.");
+        if (!data || !data.correctedText) throw new Error("Server không trả về dữ liệu hợp lệ.");
 
-        const data = JSON.parse(jsonStr);
-        return data.correctedText || "";
+        return data.correctedText;
 
     } catch (err: any) {
         console.error("Fix Grammar Error:", err);
-        throw new Error(err.message || "Lỗi khi xử lý với Gemini AI.");
+        throw new Error(err.message || "Lỗi khi xử lý văn bản.");
     }
   },
 
