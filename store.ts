@@ -11,8 +11,15 @@ const SUPABASE_KEY = 'sb_publishable_S0ZBExbtXioOE3DgS26fgA_Nwq46a_A'; // Publis
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Khởi tạo Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper function để khởi tạo Gemini Client an toàn
+const getGeminiClient = () => {
+    const apiKey = process.env.API_KEY;
+    // Kiểm tra kỹ hơn các trường hợp null/undefined/chuỗi rỗng
+    if (!apiKey || apiKey === 'undefined' || apiKey.trim() === '') {
+        throw new Error("API Key (Google Gemini) chưa được cấu hình. Vui lòng kiểm tra biến môi trường.");
+    }
+    return new GoogleGenAI({ apiKey });
+};
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -160,7 +167,9 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
                 try {
                     const rawText = finalData.segments.map((s: any) => s.text).join('\n\n');
                     
-                    // Call Gemini directly for grammar fix
+                    // Call Gemini directly for grammar fix (Lazy Init)
+                    const ai = getGeminiClient();
+
                     const response = await ai.models.generateContent({
                         model: "gemini-3-flash-preview",
                         contents: {
@@ -207,9 +216,9 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
                             };
                         }
                     }
-                } catch (geminiError) {
-                    console.warn("Auto-fix grammar failed, using raw transcript:", geminiError);
-                    // Fallback to raw data if Gemini fails
+                } catch (geminiError: any) {
+                    console.warn("Auto-fix grammar failed or API Key missing, using raw transcript:", geminiError);
+                    // Không throw lỗi ở đây để user vẫn nhận được kết quả thô nếu key lỗi
                 }
                 // --- END AUTO GRAMMAR FIX STEP ---
                 
@@ -261,13 +270,16 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       set({ status: 'error', errorMessage: message, progress: 0 });
 
       const { url } = get();
-      await supabase.from('transcriptions').insert({
-          video_url: url,
-          video_title: 'Failed Video',
-          duration: '00:00',
-          status: 'error',
-          error_message: message
-      });
+      // Chỉ lưu log lỗi nếu không phải do thiếu API key (để tránh spam DB)
+      if (!message.includes("API Key")) {
+          await supabase.from('transcriptions').insert({
+              video_url: url,
+              video_title: 'Failed Video',
+              duration: '00:00',
+              status: 'error',
+              error_message: message
+          });
+      }
       get().fetchHistory();
     }
   },
@@ -277,6 +289,9 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     if (!transcript) return "";
 
     try {
+        // Lazy initialization
+        const ai = getGeminiClient();
+        
         const fullText = transcript.segments.map(s => s.text).join('\n\n');
 
         const response = await ai.models.generateContent({
