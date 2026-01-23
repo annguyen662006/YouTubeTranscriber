@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useTranscriptionStore } from '../store';
 import { VI } from '../lang/vi';
 
 interface LayoutProps {
@@ -6,6 +8,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { view, setView } = useTranscriptionStore();
+
   return (
     <div className="relative min-h-screen w-full animated-bg flex flex-col text-white">
         {/* Dynamic Background Elements */}
@@ -21,36 +25,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Header */}
         <header className="relative z-50 w-full px-6 py-5 lg:px-12 flex items-center justify-between border-b border-white/5 bg-black/10 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20 text-primary shadow-lg shadow-primary/20">
-                <span className="material-symbols-outlined" style={{fontSize: '24px'}}>graphic_eq</span>
-            </div>
-            <h2 className="text-white text-lg font-bold tracking-tight">{VI.header.title}</h2>
-            </div>
-            
-            <nav className="hidden md:flex items-center gap-8">
-                <a href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">{VI.header.nav.home}</a>
-                <a href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">{VI.header.nav.features}</a>
-                <a href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">{VI.header.nav.pricing}</a>
-                <a href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">{VI.header.nav.contact}</a>
-            </nav>
-            
-            <div className="flex items-center gap-4">
-                <button className="hidden sm:flex text-sm font-medium text-white/80 hover:text-white transition-colors">
-                    {VI.header.auth.login}
-                </button>
-                <div className="h-8 w-8 overflow-hidden rounded-full border border-white/20 bg-white/10" title="User Avatar">
-                    <img 
-                        src="https://picsum.photos/100/100" 
-                        alt="User Avatar" 
-                        className="h-full w-full object-cover" 
-                    />
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('home')}>
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20 text-primary shadow-lg shadow-primary/20">
+                    <span className="material-symbols-outlined" style={{fontSize: '24px'}}>graphic_eq</span>
                 </div>
+                <h2 className="text-white text-lg font-bold tracking-tight">{VI.header.title}</h2>
             </div>
+            
+            <nav className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                <button 
+                    onClick={() => setView('home')}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${view === 'home' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                >
+                    {VI.header.nav.home}
+                </button>
+                <button 
+                    onClick={() => setView('history')}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${view === 'history' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                >
+                    {VI.header.nav.history}
+                </button>
+            </nav>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 relative z-10">
+        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 relative z-10 w-full">
             {children}
         </main>
 

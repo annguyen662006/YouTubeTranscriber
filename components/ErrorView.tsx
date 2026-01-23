@@ -17,7 +17,7 @@ const ErrorView: React.FC = () => {
             <div className="flex items-center justify-center gap-2 text-sm text-white/40 mb-2">
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">link</span> {VI.error.breadcrumbs.url}</span>
                 <span className="material-symbols-outlined text-[12px]">chevron_right</span>
-                <span className="flex items-center gap-1 text-red-400/80 font-medium"><span class="material-symbols-outlined text-[16px]">error</span> {VI.error.breadcrumbs.analyze}</span>
+                <span className="flex items-center gap-1 text-red-400/80 font-medium"><span className="material-symbols-outlined text-[16px]">error</span> {VI.error.breadcrumbs.analyze}</span>
                 <span className="material-symbols-outlined text-[12px]">chevron_right</span>
                 <span>{VI.error.breadcrumbs.result}</span>
             </div>

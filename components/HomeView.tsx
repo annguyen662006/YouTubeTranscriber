@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { useTranscriptionStore } from '../store';
 import { VI } from '../lang/vi';
@@ -37,13 +38,25 @@ const HomeView: React.FC = () => {
           <span className="material-symbols-outlined text-primary" style={{fontSize: '32px'}}>smart_toy</span>
         </div>
         
-        <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-6 leading-tight drop-shadow-sm">
+        <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-8 leading-tight drop-shadow-sm">
             {VI.home.heroTitle} <br className="hidden md:block"/> {VI.home.heroTitleBreak}
         </h1>
         
-        <p className="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed font-light">
-           {VI.home.description}
-        </p>
+        {/* Features replacing description */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-10 w-full max-w-2xl">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="material-symbols-outlined text-green-400 text-[18px]">check_circle</span>
+                <span className="text-sm text-gray-300 font-medium">{VI.home.features.noCard}</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="material-symbols-outlined text-blue-400 text-[18px]">bolt</span>
+                <span className="text-sm text-gray-300 font-medium">{VI.home.features.fast}</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="material-symbols-outlined text-purple-400 text-[18px]">translate</span>
+                <span className="text-sm text-gray-300 font-medium">{VI.home.features.multiLang}</span>
+            </div>
+        </div>
 
         {/* Input Form */}
         <div className="w-full max-w-xl flex flex-col gap-4">
@@ -77,22 +90,11 @@ const HomeView: React.FC = () => {
             </button>
         </div>
 
-        {/* Footer Info */}
+        {/* Footer Info replacing features */}
         <div className="mt-10 pt-8 border-t border-white/5 w-full flex flex-col md:flex-row items-center justify-center gap-6 text-sm text-gray-400">
-            <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-green-400" style={{fontSize: '18px'}}>check_circle</span>
-                <span>{VI.home.features.noCard}</span>
-            </div>
-            <div className="hidden md:block w-1 h-1 bg-gray-600 rounded-full"></div>
-            <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-400" style={{fontSize: '18px'}}>bolt</span>
-                <span>{VI.home.features.fast}</span>
-            </div>
-            <div className="hidden md:block w-1 h-1 bg-gray-600 rounded-full"></div>
-            <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-purple-400" style={{fontSize: '18px'}}>translate</span>
-                <span>{VI.home.features.multiLang}</span>
-            </div>
+            <span className="opacity-60 font-light hover:opacity-100 transition-opacity cursor-default tracking-wide">
+                {VI.home.footerText}
+            </span>
         </div>
       </div>
     </>
